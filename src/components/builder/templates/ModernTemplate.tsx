@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import type { ResumeData } from '@/types/resume';
 import { Mail, Phone, MapPin, Linkedin, Github } from 'lucide-react';
 
@@ -129,3 +130,19 @@ export function ModernTemplate({ data }: TemplateProps) {
           <h2 className="text-xl font-bold mb-3" style={{ color: data.colors.primary }}>
             PROJECTS
           </h2>
+          <div className="space-y-3">
+            {data.projects.map((project) => (
+              <div key={project.id}>
+                <h3 className="font-bold text-gray-900">{project.name}</h3>
+                <p className="text-gray-700 mb-1">{project.description}</p>
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Technologies:</span> {project.technologies.join(', ')}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
