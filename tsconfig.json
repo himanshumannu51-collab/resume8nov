@@ -13,7 +13,11 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
       "@/*": ["./src/*"]
     }
@@ -21,22 +25,3 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
-```
-
----
-
-### **File 6: `.gitignore`**
-```
-node_modules
-.next
-.env*.local
-.vercel
-*.log
-.DS_Store
-```
-
----
-
-### **File 7: `.env.local`**
-```
-NEXT_PUBLIC_APP_URL=http://localhost:3000
