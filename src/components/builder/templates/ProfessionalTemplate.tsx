@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import type { ResumeData } from '@/types/resume';
 import { Mail, Phone, MapPin, Linkedin, Github } from 'lucide-react';
 
@@ -65,4 +66,78 @@ export function ProfessionalTemplate({ data }: TemplateProps) {
         {data.education.length > 0 && (
           <div>
             <h2 className="text-lg font-bold mb-4 text-white">EDUCATION</h2>
-            <div className="space-y-4 text-sm
+            <div className="space-y-4 text-sm text-white/90">
+              {data.education.map((edu) => (
+                <div key={edu.id}>
+                  <p className="font-bold text-white">{edu.degree}</p>
+                  <p>{edu.field}</p>
+                  <p>{edu.institution}</p>
+                  <p>{edu.startDate} - {edu.endDate}</p>
+                  {edu.gpa && <p>GPA: {edu.gpa}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        {/* Summary */}
+        {data.summary && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-3" style={{ color: data.colors.primary }}>
+              PROFILE
+            </h2>
+            <p className="text-gray-700 leading-relaxed">{data.summary}</p>
+          </div>
+        )}
+
+        {/* Experience */}
+        {data.experience.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4" style={{ color: data.colors.primary }}>
+              EXPERIENCE
+            </h2>
+            <div className="space-y-5">
+              {data.experience.map((exp) => (
+                <div key={exp.id}>
+                  <h3 className="font-bold text-lg text-gray-900">{exp.position}</h3>
+                  <p className="text-gray-700 font-semibold">{exp.company} | {exp.location}</p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                  </p>
+                  <ul className="list-disc list-inside text-gray-700 space-y-1">
+                    {exp.description.map((desc, idx) => (
+                      <li key={idx}>{desc}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Projects */}
+        {data.projects.length > 0 && (
+          <div>
+            <h2 className="text-xl font-bold mb-4" style={{ color: data.colors.primary }}>
+              PROJECTS
+            </h2>
+            <div className="space-y-4">
+              {data.projects.map((project) => (
+                <div key={project.id}>
+                  <h3 className="font-bold text-gray-900">{project.name}</h3>
+                  <p className="text-gray-700 mb-1">{project.description}</p>
+                  <p className="text-sm text-gray-600">
+                    {project.technologies.join(' • ')}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
