@@ -7,7 +7,7 @@ import { Plus, Trash2, Save } from 'lucide-react';
 
 export function ResumeEditor() {
   const { 
-    resumeData, 
+    resume, 
     updatePersonalInfo, 
     addExperience, 
     updateExperience, 
@@ -15,24 +15,33 @@ export function ResumeEditor() {
     addEducation, 
     updateEducation, 
     deleteEducation, 
-    addSkill, 
-    deleteSkill 
+    addSkillCategory, 
+    deleteSkillCategory 
   } = useResumeStore();
 
+  // Handle empty resume (no data yet)
+  if (!resume) {
+    return (
+      <div className="h-full flex items-center justify-center text-gray-500">
+        <p>No resume data found. Start by adding your personal information.</p>
+      </div>
+    );
+  }
+
   const handleSkillsChange = (value: string) => {
-    const skills = value.split('\n').filter(s => s.trim());
-    useResumeStore.setState({ 
-      resumeData: { 
-        ...resumeData, 
-        skills 
-      } 
-    });
+    const newSkills = value.split('\n').filter((s) => s.trim());
+    useResumeStore.setState((state) => ({
+      resume: {
+        ...state.resume!,
+        skills: [{ id: 'default', category: 'General', items: newSkills }],
+      },
+    }));
   };
 
   return (
     <div className="h-full overflow-y-auto bg-gray-50">
       <div className="max-w-3xl mx-auto p-6 space-y-8">
-        
+
         {/* Personal Information Section */}
         <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <h2 className="text-2xl font-bold mb-6 text-gray-900">Personal Information</h2>
@@ -43,11 +52,13 @@ export function ResumeEditor() {
               tooltip="Use your full legal name as it appears on official documents"
               required
             >
-              <input 
+              <input
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo?.fullName || ''}
-                onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
+                value={resume.personalInfo?.fullName || ''}
+                onChange={(e) =>
+                  updatePersonalInfo({ fullName: e.target.value })
+                }
                 placeholder="e.g., John Smith"
               />
             </FormFieldWithTooltip>
@@ -57,11 +68,13 @@ export function ResumeEditor() {
               tooltip="Use a professional email address (avoid nicknames or informal addresses)"
               required
             >
-              <input 
+              <input
                 type="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo?.email || ''}
-                onChange={(e) => updatePersonalInfo('email', e.target.value)}
+                value={resume.personalInfo?.email || ''}
+                onChange={(e) =>
+                  updatePersonalInfo({ email: e.target.value })
+                }
                 placeholder="e.g., john.smith@email.com"
               />
             </FormFieldWithTooltip>
@@ -70,11 +83,13 @@ export function ResumeEditor() {
               label="Phone Number"
               tooltip="Include country code if applying internationally (e.g., +1 for US/Canada)"
             >
-              <input 
+              <input
                 type="tel"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo?.phone || ''}
-                onChange={(e) => updatePersonalInfo('phone', e.target.value)}
+                value={resume.personalInfo?.phone || ''}
+                onChange={(e) =>
+                  updatePersonalInfo({ phone: e.target.value })
+                }
                 placeholder="e.g., (555) 123-4567"
               />
             </FormFieldWithTooltip>
@@ -83,11 +98,13 @@ export function ResumeEditor() {
               label="Location"
               tooltip="City and State/Country is sufficient (no need for full address)"
             >
-              <input 
+              <input
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo?.location || ''}
-                onChange={(e) => updatePersonalInfo('location', e.target.value)}
+                value={resume.personalInfo?.location || ''}
+                onChange={(e) =>
+                  updatePersonalInfo({ location: e.target.value })
+                }
                 placeholder="e.g., San Francisco, CA"
               />
             </FormFieldWithTooltip>
@@ -96,24 +113,28 @@ export function ResumeEditor() {
               label="LinkedIn URL"
               tooltip="Copy your full LinkedIn profile URL (e.g., linkedin.com/in/yourname)"
             >
-              <input 
+              <input
                 type="url"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo?.linkedin || ''}
-                onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
+                value={resume.personalInfo?.linkedin || ''}
+                onChange={(e) =>
+                  updatePersonalInfo({ linkedin: e.target.value })
+                }
                 placeholder="e.g., linkedin.com/in/johnsmith"
               />
             </FormFieldWithTooltip>
 
             <FormFieldWithTooltip
               label="Portfolio/Website"
-              tooltip="Include your portfolio, GitHub, or personal website if relevant to the job"
+              tooltip="Include your portfolio, GitHub, or personal website if relevant"
             >
-              <input 
+              <input
                 type="url"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo?.website || ''}
-                onChange={(e) => updatePersonalInfo('website', e.target.value)}
+                value={resume.personalInfo?.website || ''}
+                onChange={(e) =>
+                  updatePersonalInfo({ website: e.target.value })
+                }
                 placeholder="e.g., github.com/johnsmith"
               />
             </FormFieldWithTooltip>
@@ -122,21 +143,21 @@ export function ResumeEditor() {
           <div className="mt-6">
             <FormFieldWithTooltip
               label="Professional Summary"
-              tooltip="Write 2-4 sentences highlighting your experience, skills, and career goals. Focus on what makes you unique."
+              tooltip="2-4 sentences summarizing experience, skills, and goals"
               tooltipType="success"
             >
-              <textarea 
+              <textarea
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={4}
-                value={resumeData.personalInfo?.summary || ''}
-                onChange={(e) => updatePersonalInfo('summary', e.target.value)}
-                placeholder="e.g., Results-driven software engineer with 5+ years of experience building scalable web applications..."
+                value={resume.summary || ''}
+                onChange={(e) => useResumeStore.getState().updateSummary(e.target.value)}
+                placeholder="Results-driven software engineer with 5+ years experience building scalable web applications..."
               />
             </FormFieldWithTooltip>
           </div>
         </section>
 
-        {/* Work Experience Section */}
+        {/* Experience Section */}
         <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Work Experience</h2>
@@ -149,14 +170,14 @@ export function ResumeEditor() {
             </button>
           </div>
 
-          {resumeData.experience?.length === 0 && (
+          {resume.experience?.length === 0 && (
             <p className="text-gray-500 text-center py-8">
               No work experience added yet. Click "Add Experience" to get started.
             </p>
           )}
 
           <div className="space-y-6">
-            {resumeData.experience?.map((exp) => (
+            {resume.experience?.map((exp) => (
               <div key={exp.id} className="p-4 border border-gray-200 rounded-lg relative bg-gray-50">
                 <button
                   onClick={() => deleteExperience(exp.id)}
@@ -167,72 +188,46 @@ export function ResumeEditor() {
                 </button>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <FormFieldWithTooltip
-                    label="Job Title"
-                    tooltip="Your official job title (e.g., Senior Software Engineer, Marketing Manager)"
-                    required
-                  >
-                    <input 
+                  <FormFieldWithTooltip label="Position" required>
+                    <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      value={exp.jobTitle || ''}
-                      onChange={(e) => updateExperience(exp.id, 'jobTitle', e.target.value)}
-                      placeholder="e.g., Senior Software Engineer"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      value={exp.position || ''}
+                      onChange={(e) =>
+                        updateExperience(exp.id, { position: e.target.value })
+                      }
+                      placeholder="e.g., Software Engineer"
                     />
                   </FormFieldWithTooltip>
 
-                  <FormFieldWithTooltip
-                    label="Company Name"
-                    tooltip="Full company name (no abbreviations unless widely known)"
-                    required
-                  >
-                    <input 
+                  <FormFieldWithTooltip label="Company" required>
+                    <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                       value={exp.company || ''}
-                      onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
+                      onChange={(e) =>
+                        updateExperience(exp.id, { company: e.target.value })
+                      }
                       placeholder="e.g., Google Inc."
-                    />
-                  </FormFieldWithTooltip>
-
-                  <FormFieldWithTooltip
-                    label="Start Date"
-                    tooltip="Use Month Year format (e.g., January 2020)"
-                  >
-                    <input 
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      value={exp.startDate || ''}
-                      onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
-                      placeholder="e.g., January 2020"
-                    />
-                  </FormFieldWithTooltip>
-
-                  <FormFieldWithTooltip
-                    label="End Date"
-                    tooltip="Write 'Present' if you currently work here"
-                  >
-                    <input 
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      value={exp.endDate || ''}
-                      onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
-                      placeholder="e.g., Present"
                     />
                   </FormFieldWithTooltip>
                 </div>
 
                 <FormFieldWithTooltip
                   label="Description & Achievements"
-                  tooltip="Use bullet points starting with action verbs. Quantify achievements (e.g., 'Increased sales by 30%')."
+                  tooltip="Use bullet points and measurable results"
                   tooltipType="success"
                 >
-                  <textarea 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                    rows={5}
-                    value={exp.description || ''}
-                    onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
-                    placeholder="• Led team of 5 developers to deliver project 2 weeks ahead of schedule&#10;• Improved performance by 40%"
+                  <textarea
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                    value={exp.description?.join('\n') || ''}
+                    onChange={(e) =>
+                      updateExperience(exp.id, {
+                        description: e.target.value.split('\n'),
+                      })
+                    }
+                    placeholder="• Led team of 5 developers to deliver project early..."
                   />
                 </FormFieldWithTooltip>
               </div>
@@ -253,14 +248,14 @@ export function ResumeEditor() {
             </button>
           </div>
 
-          {resumeData.education?.length === 0 && (
+          {resume.education?.length === 0 && (
             <p className="text-gray-500 text-center py-8">
               No education added yet. Click "Add Education" to get started.
             </p>
           )}
 
           <div className="space-y-6">
-            {resumeData.education?.map((edu) => (
+            {resume.education?.map((edu) => (
               <div key={edu.id} className="p-4 border border-gray-200 rounded-lg relative bg-gray-50">
                 <button
                   onClick={() => deleteEducation(edu.id)}
@@ -271,57 +266,27 @@ export function ResumeEditor() {
                 </button>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormFieldWithTooltip
-                    label="Degree"
-                    tooltip="Full degree name (e.g., Bachelor of Science in Computer Science)"
-                    required
-                  >
-                    <input 
+                  <FormFieldWithTooltip label="Degree" required>
+                    <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                       value={edu.degree || ''}
-                      onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
-                      placeholder="e.g., Bachelor of Science in Computer Science"
+                      onChange={(e) =>
+                        updateEducation(edu.id, { degree: e.target.value })
+                      }
+                      placeholder="e.g., Bachelor of Science"
                     />
                   </FormFieldWithTooltip>
 
-                  <FormFieldWithTooltip
-                    label="School Name"
-                    tooltip="Full institution name"
-                    required
-                  >
-                    <input 
+                  <FormFieldWithTooltip label="Institution" required>
+                    <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      value={edu.school || ''}
-                      onChange={(e) => updateEducation(edu.id, 'school', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      value={edu.institution || ''}
+                      onChange={(e) =>
+                        updateEducation(edu.id, { institution: e.target.value })
+                      }
                       placeholder="e.g., Stanford University"
-                    />
-                  </FormFieldWithTooltip>
-
-                  <FormFieldWithTooltip
-                    label="Graduation Year"
-                    tooltip="Year you graduated or expect to graduate"
-                  >
-                    <input 
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      value={edu.graduationYear || ''}
-                      onChange={(e) => updateEducation(edu.id, 'graduationYear', e.target.value)}
-                      placeholder="e.g., 2020"
-                    />
-                  </FormFieldWithTooltip>
-
-                  <FormFieldWithTooltip
-                    label="GPA (Optional)"
-                    tooltip="Only include if 3.5 or higher (out of 4.0)"
-                  >
-                    <input 
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      value={edu.gpa || ''}
-                      onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
-                      placeholder="e.g., 3.8/4.0"
                     />
                   </FormFieldWithTooltip>
                 </div>
@@ -332,33 +297,32 @@ export function ResumeEditor() {
 
         {/* Skills Section */}
         <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Skills</h2>
-          </div>
-
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">Skills</h2>
           <FormFieldWithTooltip
             label="Add Your Skills"
-            tooltip="List skills relevant to the job. One per line."
+            tooltip="List your technical and soft skills (one per line)"
             tooltipType="success"
           >
-            <textarea 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <textarea
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
               rows={6}
-              value={resumeData.skills?.join('\n') || ''}
+              value={
+                resume.skills?.flatMap((s) => s.items).join('\n') || ''
+              }
               onChange={(e) => handleSkillsChange(e.target.value)}
-              placeholder="JavaScript&#10;React&#10;Node.js&#10;Python&#10;Project Management"
+              placeholder="JavaScript\nReact\nNode.js\nLeadership"
             />
           </FormFieldWithTooltip>
 
-          {resumeData.skills?.length > 0 && (
+          {resume.skills?.length > 0 && (
             <div className="mt-4">
               <p className="text-sm font-medium text-gray-700 mb-2">Your Skills:</p>
               <div className="flex flex-wrap gap-2">
-                {resumeData.skills.map((skill, index) => (
+                {resume.skills.flatMap((s) => s.items).map((skill, index) => (
                   <div key={index} className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200">
                     <span className="text-sm font-medium">{skill}</span>
                     <button
-                      onClick={() => deleteSkill(skill)}
+                      onClick={() => deleteSkillCategory(s.id)}
                       className="hover:bg-blue-100 rounded-full p-0.5 transition"
                       title={`Remove ${skill}`}
                     >
@@ -374,7 +338,7 @@ export function ResumeEditor() {
         {/* Save Indicator */}
         <div className="flex items-center justify-center gap-2 text-sm text-green-600 py-4 bg-green-50 rounded-lg border border-green-200">
           <Save className="w-4 h-4" />
-          <span className="font-medium">All changes saved automatically to your browser</span>
+          <span className="font-medium">All changes saved automatically</span>
         </div>
       </div>
     </div>
