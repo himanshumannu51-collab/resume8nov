@@ -5,7 +5,7 @@ import { useResumeStore } from '@/store/resumeStore';
 import { FormFieldWithTooltip } from '@/components/ui/tooltip';
 import { Plus, Trash2, Save } from 'lucide-react';
 
-export function Editor() {
+export function ResumeEditor() {
   const { 
     resumeData, 
     updatePersonalInfo, 
@@ -224,7 +224,7 @@ export function Editor() {
 
                 <FormFieldWithTooltip
                   label="Description & Achievements"
-                  tooltip="Use bullet points starting with action verbs. Quantify achievements with numbers, percentages, or metrics whenever possible (e.g., 'Increased sales by 30%')"
+                  tooltip="Use bullet points starting with action verbs. Quantify achievements (e.g., 'Increased sales by 30%')."
                   tooltipType="success"
                 >
                   <textarea 
@@ -232,7 +232,7 @@ export function Editor() {
                     rows={5}
                     value={exp.description || ''}
                     onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
-                    placeholder="• Led team of 5 developers to deliver project 2 weeks ahead of schedule&#10;• Improved application performance by 40% through code optimization&#10;• Implemented new features that increased user engagement by 25%"
+                    placeholder="• Led team of 5 developers to deliver project 2 weeks ahead of schedule&#10;• Improved performance by 40%"
                   />
                 </FormFieldWithTooltip>
               </div>
@@ -338,7 +338,7 @@ export function Editor() {
 
           <FormFieldWithTooltip
             label="Add Your Skills"
-            tooltip="List technical and soft skills relevant to the job. Separate each skill with a new line. Focus on skills mentioned in the job description."
+            tooltip="List skills relevant to the job. One per line."
             tooltipType="success"
           >
             <textarea 
@@ -346,7 +346,7 @@ export function Editor() {
               rows={6}
               value={resumeData.skills?.join('\n') || ''}
               onChange={(e) => handleSkillsChange(e.target.value)}
-              placeholder="JavaScript&#10;React&#10;Node.js&#10;Python&#10;Project Management&#10;Team Leadership"
+              placeholder="JavaScript&#10;React&#10;Node.js&#10;Python&#10;Project Management"
             />
           </FormFieldWithTooltip>
 
