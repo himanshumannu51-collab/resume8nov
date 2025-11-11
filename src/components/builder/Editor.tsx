@@ -6,14 +6,35 @@ import { FormFieldWithTooltip } from '@/components/ui/tooltip';
 import { Plus, Trash2, Save } from 'lucide-react';
 
 export function Editor() {
-  const { resumeData, updatePersonalInfo, addExperience, updateExperience, deleteExperience, addEducation, updateEducation, deleteEducation, addSkill, deleteSkill } = useResumeStore();
+  const { 
+    resumeData, 
+    updatePersonalInfo, 
+    addExperience, 
+    updateExperience, 
+    deleteExperience, 
+    addEducation, 
+    updateEducation, 
+    deleteEducation, 
+    addSkill, 
+    deleteSkill 
+  } = useResumeStore();
+
+  const handleSkillsChange = (value: string) => {
+    const skills = value.split('\n').filter(s => s.trim());
+    useResumeStore.setState({ 
+      resumeData: { 
+        ...resumeData, 
+        skills 
+      } 
+    });
+  };
 
   return (
-    <div className="h-full overflow-y-auto bg-white">
+    <div className="h-full overflow-y-auto bg-gray-50">
       <div className="max-w-3xl mx-auto p-6 space-y-8">
         
         {/* Personal Information Section */}
-        <section className="bg-white rounded-lg border border-gray-200 p-6">
+        <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <h2 className="text-2xl font-bold mb-6 text-gray-900">Personal Information</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -25,7 +46,7 @@ export function Editor() {
               <input 
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo.fullName}
+                value={resumeData.personalInfo?.fullName || ''}
                 onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
                 placeholder="e.g., John Smith"
               />
@@ -39,7 +60,7 @@ export function Editor() {
               <input 
                 type="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo.email}
+                value={resumeData.personalInfo?.email || ''}
                 onChange={(e) => updatePersonalInfo('email', e.target.value)}
                 placeholder="e.g., john.smith@email.com"
               />
@@ -52,7 +73,7 @@ export function Editor() {
               <input 
                 type="tel"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo.phone}
+                value={resumeData.personalInfo?.phone || ''}
                 onChange={(e) => updatePersonalInfo('phone', e.target.value)}
                 placeholder="e.g., (555) 123-4567"
               />
@@ -65,7 +86,7 @@ export function Editor() {
               <input 
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo.location}
+                value={resumeData.personalInfo?.location || ''}
                 onChange={(e) => updatePersonalInfo('location', e.target.value)}
                 placeholder="e.g., San Francisco, CA"
               />
@@ -78,7 +99,7 @@ export function Editor() {
               <input 
                 type="url"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo.linkedin}
+                value={resumeData.personalInfo?.linkedin || ''}
                 onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
                 placeholder="e.g., linkedin.com/in/johnsmith"
               />
@@ -91,7 +112,7 @@ export function Editor() {
               <input 
                 type="url"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={resumeData.personalInfo.website}
+                value={resumeData.personalInfo?.website || ''}
                 onChange={(e) => updatePersonalInfo('website', e.target.value)}
                 placeholder="e.g., github.com/johnsmith"
               />
@@ -107,7 +128,7 @@ export function Editor() {
               <textarea 
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={4}
-                value={resumeData.personalInfo.summary}
+                value={resumeData.personalInfo?.summary || ''}
                 onChange={(e) => updatePersonalInfo('summary', e.target.value)}
                 placeholder="e.g., Results-driven software engineer with 5+ years of experience building scalable web applications..."
               />
@@ -116,7 +137,7 @@ export function Editor() {
         </section>
 
         {/* Work Experience Section */}
-        <section className="bg-white rounded-lg border border-gray-200 p-6">
+        <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Work Experience</h2>
             <button
@@ -128,12 +149,19 @@ export function Editor() {
             </button>
           </div>
 
+          {resumeData.experience?.length === 0 && (
+            <p className="text-gray-500 text-center py-8">
+              No work experience added yet. Click "Add Experience" to get started.
+            </p>
+          )}
+
           <div className="space-y-6">
-            {resumeData.experience.map((exp, index) => (
-              <div key={exp.id} className="p-4 border border-gray-200 rounded-lg relative">
+            {resumeData.experience?.map((exp) => (
+              <div key={exp.id} className="p-4 border border-gray-200 rounded-lg relative bg-gray-50">
                 <button
                   onClick={() => deleteExperience(exp.id)}
                   className="absolute top-4 right-4 p-2 text-red-600 hover:bg-red-50 rounded-md transition"
+                  title="Delete this experience"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -146,8 +174,8 @@ export function Editor() {
                   >
                     <input 
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={exp.jobTitle}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      value={exp.jobTitle || ''}
                       onChange={(e) => updateExperience(exp.id, 'jobTitle', e.target.value)}
                       placeholder="e.g., Senior Software Engineer"
                     />
@@ -160,8 +188,8 @@ export function Editor() {
                   >
                     <input 
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={exp.company}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      value={exp.company || ''}
                       onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
                       placeholder="e.g., Google Inc."
                     />
@@ -173,8 +201,8 @@ export function Editor() {
                   >
                     <input 
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={exp.startDate}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      value={exp.startDate || ''}
                       onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
                       placeholder="e.g., January 2020"
                     />
@@ -186,8 +214,8 @@ export function Editor() {
                   >
                     <input 
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={exp.endDate}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      value={exp.endDate || ''}
                       onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
                       placeholder="e.g., Present"
                     />
@@ -200,9 +228,9 @@ export function Editor() {
                   tooltipType="success"
                 >
                   <textarea 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                     rows={5}
-                    value={exp.description}
+                    value={exp.description || ''}
                     onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
                     placeholder="• Led team of 5 developers to deliver project 2 weeks ahead of schedule&#10;• Improved application performance by 40% through code optimization&#10;• Implemented new features that increased user engagement by 25%"
                   />
@@ -213,7 +241,7 @@ export function Editor() {
         </section>
 
         {/* Education Section */}
-        <section className="bg-white rounded-lg border border-gray-200 p-6">
+        <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Education</h2>
             <button
@@ -225,12 +253,19 @@ export function Editor() {
             </button>
           </div>
 
+          {resumeData.education?.length === 0 && (
+            <p className="text-gray-500 text-center py-8">
+              No education added yet. Click "Add Education" to get started.
+            </p>
+          )}
+
           <div className="space-y-6">
-            {resumeData.education.map((edu) => (
-              <div key={edu.id} className="p-4 border border-gray-200 rounded-lg relative">
+            {resumeData.education?.map((edu) => (
+              <div key={edu.id} className="p-4 border border-gray-200 rounded-lg relative bg-gray-50">
                 <button
                   onClick={() => deleteEducation(edu.id)}
                   className="absolute top-4 right-4 p-2 text-red-600 hover:bg-red-50 rounded-md transition"
+                  title="Delete this education"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -243,8 +278,8 @@ export function Editor() {
                   >
                     <input 
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={edu.degree}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      value={edu.degree || ''}
                       onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
                       placeholder="e.g., Bachelor of Science in Computer Science"
                     />
@@ -257,8 +292,8 @@ export function Editor() {
                   >
                     <input 
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={edu.school}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      value={edu.school || ''}
                       onChange={(e) => updateEducation(edu.id, 'school', e.target.value)}
                       placeholder="e.g., Stanford University"
                     />
@@ -270,8 +305,8 @@ export function Editor() {
                   >
                     <input 
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={edu.graduationYear}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      value={edu.graduationYear || ''}
                       onChange={(e) => updateEducation(edu.id, 'graduationYear', e.target.value)}
                       placeholder="e.g., 2020"
                     />
@@ -283,8 +318,8 @@ export function Editor() {
                   >
                     <input 
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      value={edu.gpa}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      value={edu.gpa || ''}
                       onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
                       placeholder="e.g., 3.8/4.0"
                     />
@@ -296,47 +331,50 @@ export function Editor() {
         </section>
 
         {/* Skills Section */}
-        <section className="bg-white rounded-lg border border-gray-200 p-6">
+        <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Skills</h2>
           </div>
 
           <FormFieldWithTooltip
             label="Add Your Skills"
-            tooltip="List technical and soft skills relevant to the job. Separate with commas or line breaks. Focus on skills mentioned in the job description."
+            tooltip="List technical and soft skills relevant to the job. Separate each skill with a new line. Focus on skills mentioned in the job description."
             tooltipType="success"
           >
             <textarea 
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={6}
-              value={resumeData.skills.join('\n')}
-              onChange={(e) => {
-                const skills = e.target.value.split('\n').filter(s => s.trim());
-                useResumeStore.setState({ resumeData: { ...resumeData, skills } });
-              }}
-              placeholder="e.g.,&#10;JavaScript, React, Node.js&#10;Python, Django, REST APIs&#10;Project Management&#10;Team Leadership"
+              value={resumeData.skills?.join('\n') || ''}
+              onChange={(e) => handleSkillsChange(e.target.value)}
+              placeholder="JavaScript&#10;React&#10;Node.js&#10;Python&#10;Project Management&#10;Team Leadership"
             />
           </FormFieldWithTooltip>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {resumeData.skills.map((skill, index) => (
-              <div key={index} className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
-                <span className="text-sm">{skill}</span>
-                <button
-                  onClick={() => deleteSkill(skill)}
-                  className="hover:bg-blue-100 rounded-full p-1"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
+          {resumeData.skills?.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-700 mb-2">Your Skills:</p>
+              <div className="flex flex-wrap gap-2">
+                {resumeData.skills.map((skill, index) => (
+                  <div key={index} className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200">
+                    <span className="text-sm font-medium">{skill}</span>
+                    <button
+                      onClick={() => deleteSkill(skill)}
+                      className="hover:bg-blue-100 rounded-full p-0.5 transition"
+                      title={`Remove ${skill}`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </section>
 
         {/* Save Indicator */}
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-500 py-4">
+        <div className="flex items-center justify-center gap-2 text-sm text-green-600 py-4 bg-green-50 rounded-lg border border-green-200">
           <Save className="w-4 h-4" />
-          <span>Changes saved automatically</span>
+          <span className="font-medium">All changes saved automatically to your browser</span>
         </div>
       </div>
     </div>
