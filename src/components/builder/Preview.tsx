@@ -3,7 +3,7 @@
 import { useResumeStore } from '@/store/resumeStore';
 import { ModernTemplate } from './templates/ModernTemplate';
 import { ProfessionalTemplate } from './templates/ProfessionalTemplate';
-import { MinimalistTemplate } from './templates/MinimalistTemplate';
+import { MinimalTemplate } from './templates/MinimalistTemplate'; // ✅ Fixed import
 
 export function ResumePreview() {
   const { resume } = useResumeStore();
@@ -16,8 +16,8 @@ export function ResumePreview() {
         return <ModernTemplate data={resume} />;
       case 'professional':
         return <ProfessionalTemplate data={resume} />;
-      case 'minimalist':
-        return <MinimalistTemplate data={resume} />;
+      case 'minimal':
+        return <MinimalTemplate data={resume} />; // ✅ Matches export
       default:
         return <ModernTemplate data={resume} />;
     }
